@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Learning from data</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Learning from data</h1>
+
+
+
+<p>This page is designed to explain how <code>?lpdf</code> objects can
+be used for automated learning of hyperparameters and general fitting of
+predictors.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(outerbase)</span></code></pre></div>
+<p>Let’s set things up for a 3 dimensional example.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>om <span class="ot">=</span> <span class="fu">new</span>(outermod)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">setcovfs</span>(om, <span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,d))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>knotlist <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="fl">0.01</span>,<span class="fl">0.99</span>,<span class="at">by=</span><span class="fl">0.02</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                <span class="fu">seq</span>(<span class="fl">0.01</span>,<span class="fl">0.99</span>,<span class="at">by=</span><span class="fl">0.02</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">seq</span>(<span class="fl">0.01</span>,<span class="fl">0.99</span>,<span class="at">by=</span><span class="fl">0.02</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setknot</span>(om, knotlist)</span></code></pre></div>
+<div id="hyperparameter-impact" class="section level2">
+<h2>Hyperparameter impact</h2>
+<p>The values of covariance function hyperparameters are extremely
+important for successful near-interpolation of surfaces. This impact is
+felt in <code>outerbase</code> and this section is designed to
+illustrate that.</p>
+<p>Consider the first four basis functions plotted below.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sampsize <span class="ot">=</span> <span class="dv">30</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>design1d <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>sampsize),<span class="dv">1-1</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>sampsize),<span class="dv">1</span><span class="sc">/</span>sampsize)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">cbind</span>(design1d,<span class="fu">sample</span>(design1d),<span class="fu">sample</span>(design1d))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ob <span class="ot">=</span> <span class="fu">new</span>(outerbase, om, x)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>basis_func0 <span class="ot">=</span> ob<span class="sc">$</span><span class="fu">getbase</span>(<span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(x[,<span class="dv">1</span>],basis_func0[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">type=</span><span class="st">&#39;l&#39;</span>, <span class="at">ylab=</span><span class="st">&quot;func&quot;</span>, <span class="at">xlab=</span><span class="st">&quot;first dim&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The hyperparameters will now be changed in a way that we know will
+change these basis functions. Note that <code>ob$build</code> is
+required after updating the hyperparameters for it to take effect as
+<code>ob</code> does not know when <code>om</code> is updated.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hyp0 <span class="ot">=</span> <span class="fu">gethyp</span>(om)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>hyp0[<span class="dv">2</span>] <span class="ot">=</span> <span class="dv">3</span> <span class="co">#changing the power on first parameter</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>om<span class="sc">$</span><span class="fu">updatehyp</span>(hyp0)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ob<span class="sc">$</span><span class="fu">build</span>() <span class="co">#rebuild after updatehyp</span></span></code></pre></div>
+<p>This leads to an asymmetric basis function set for this first
+dimension because of the power transform in
+<code>?covf_mat25pow</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>basis_func1 <span class="ot">=</span> ob<span class="sc">$</span><span class="fu">getbase</span>(<span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(x[,<span class="dv">1</span>],basis_func0[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">type=</span><span class="st">&#39;l&#39;</span>, <span class="at">ylab=</span><span class="st">&quot;func&quot;</span>, <span class="at">xlab=</span><span class="st">&quot;first dim&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">main=</span><span class="st">&quot;original hyperparameters&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(x[,<span class="dv">1</span>],basis_func1[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">type=</span><span class="st">&#39;l&#39;</span>, <span class="at">ylab=</span><span class="st">&quot;func&quot;</span>, <span class="at">xlab=</span><span class="st">&quot;first dim&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">main=</span><span class="st">&quot;new hyperparameters&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="45%" /><img src="data:image/png;base64,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" width="45%" /></p>
+</div>
+<div id="lpdf-for-learning" class="section level2">
+<h2>lpdf for learning</h2>
+<p>The core building block for outerbase learning is the base class
+<code>?lpdf</code>, log probability density functions. This base class
+forms the backbone behind learning using statistical models. Instances
+of this class allow us to optimize coefficients, infer on uncertainty
+and learn hyperparameters of covariance functions.</p>
+<p>A small dataset can illustrate (almost) all core concepts related to
+<code>lpdf</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">obtest_borehole3d</span>(x)</span></code></pre></div>
+<p>The length of the hyperparameters is 2 dimensions for each covariance
+function for a total of 6 hyperparameters.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gethyp</span>(om)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; inpt1.scale inpt1.power inpt2.scale inpt2.power inpt3.scale inpt3.power </span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           0           3           0           0           0           0</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>hyp0 <span class="ot">=</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>,<span class="dv">0</span>,<span class="sc">-</span><span class="fl">0.5</span>,<span class="dv">0</span>,<span class="sc">-</span><span class="fl">0.5</span>,<span class="dv">0</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>om<span class="sc">$</span><span class="fu">updatehyp</span>(hyp0)</span></code></pre></div>
+<p>We will use <code>60</code> terms to build our approximation.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">=</span> om<span class="sc">$</span><span class="fu">selectterms</span>(<span class="dv">60</span>)</span></code></pre></div>
+<p>The idea is to build a <code>loglik</code> object that represent that
+log likelihood of our data given the model and coefficients. We will
+begin with <code>?loglik_std</code>, although this model is not
+recommended for speed reasons. We can initialize it and check that we
+can get gradients with respect to coefficients, covariance
+hyperparameters, and parameters of the <code>lpdf</code> object
+itself.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>loglik <span class="ot">=</span> <span class="fu">new</span>(loglik_std, om, terms, y, x) </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>coeff0 <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>,loglik<span class="sc">$</span>nterms)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>loglik<span class="sc">$</span><span class="fu">update</span>(coeff0) <span class="co"># update it to get gradients</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>loglik<span class="sc">$</span>val</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -160.7842</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(loglik<span class="sc">$</span>grad) <span class="co"># dim 60 for number of coeffients</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            [,1]</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.1046944</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -1.0283251</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] -0.3458546</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  2.9306071</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] -0.4560907</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,] -0.1768621</span></span></code></pre></div>
+<p>A reasonable statistical model also needs prior on the coefficients.
+This tells us what distribution we expect on the coefficients.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>logpr <span class="ot">=</span> <span class="fu">new</span>(logpr_gauss, om, terms)</span></code></pre></div>
+<p>To make the handling of these two objects <code>loglik</code> and
+<code>logpr</code> easier, the <code>?lpdfvec</code> class is helpful to
+tie the objects together. It will share the hyperparameter vector
+between them, so they need to be based on the same <code>outermod</code>
+object. But it will concatenate the parameters.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>logpdf <span class="ot">=</span> <span class="fu">new</span>(lpdfvec, loglik, logpr)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>para0 <span class="ot">=</span> <span class="fu">getpara</span>(logpdf)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>para0</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; noisescale coeffscale </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3.035664   6.000000</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>para0[<span class="dv">2</span>] <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>logpdf<span class="sc">$</span><span class="fu">updatepara</span>(para0)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">getpara</span>(logpdf)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; noisescale coeffscale </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   3.035664   4.000000</span></span></code></pre></div>
+<p>The coefficients <code>coeff</code> are considered ancillary
+parameters that need to be optimized out (or something more
+sophisticated, hint on current research). For this class, it is easiest
+to do this via <code>lpdf$optnewton</code>, which takes a single Newton
+step to optimize the coefficients.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>logpdf<span class="sc">$</span><span class="fu">optnewton</span>()</span></code></pre></div>
+<p>Some test data will help illustrate prediction.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>testsampsize <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>xtest <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(testsampsize<span class="sc">*</span>d),<span class="at">ncol=</span>d)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ytest <span class="ot">=</span> <span class="fu">obtest_borehole3d</span>(xtest)</span></code></pre></div>
+<p>We can see the predictive accuracy using the <code>?predictor</code>
+class which automatically pulls correct information out of
+<code>loglik</code> to design predictions.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>predt <span class="ot">=</span> <span class="fu">new</span>(predictor,loglik)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>predt<span class="sc">$</span><span class="fu">update</span>(xtest)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">=</span> <span class="fu">as.vector</span>(predt<span class="sc">$</span><span class="fu">mean</span>())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>varpred <span class="ot">=</span> <span class="fu">as.vector</span>(predt<span class="sc">$</span><span class="fu">var</span>())</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(yhat,ytest, <span class="at">xlab=</span><span class="st">&quot;prediction&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;actual&quot;</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>yhat)<span class="sc">/</span><span class="fu">sqrt</span>(varpred),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;standarized test residuals&quot;</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;standarized test residuals&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="45%" /><img src="data:image/png;base64,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" width="45%" /></p>
+</div>
+<div id="lpdf-and-hyperparameters" class="section level2">
+<h2>lpdf and hyperparameters</h2>
+<p>The main value in this approach is the automated pulling of important
+gradients related to covariance hyperparameters and model
+parameters.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>logpdf<span class="sc">$</span><span class="fu">optnewton</span>()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>logpdf<span class="sc">$</span>gradhyp    <span class="co"># dim 6 for all hyperparameter</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            [,1]</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -1.2753801</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  0.1352539</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]  7.4960689</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  0.8817342</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,]  8.5644385</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]  0.9453822</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>logpdf<span class="sc">$</span>gradpara   <span class="co"># dim 2 since 2 parameters</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            [,1]</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -18.283833</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  -3.063965</span></span></code></pre></div>
+<p>This allows us to use custom functions to learn these hyperparameters
+to give maximum predictive power. The goal right now is a single point
+estimate of these hyperparameters. One has to be very careful to keep
+these in good ranges, and the call below will make sure to return
+<code>-inf</code> if there is a problem with the chosen
+hyperparameters.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>totobj <span class="ot">=</span> <span class="cf">function</span>(parlist) { <span class="co">#my optimization function for tuning</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  regpara <span class="ot">=</span> logpdf<span class="sc">$</span><span class="fu">paralpdf</span>(parlist<span class="sc">$</span>para) <span class="co"># get regularization for lpdf</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  reghyp <span class="ot">=</span> om<span class="sc">$</span><span class="fu">hyplpdf</span>(parlist<span class="sc">$</span>hyp) <span class="co"># get regularization for om</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.finite</span>(regpara) <span class="sc">&amp;&amp;</span> <span class="fu">is.finite</span>(reghyp)) { <span class="co"># if they pass</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    om<span class="sc">$</span><span class="fu">updatehyp</span>(parlist<span class="sc">$</span>hyp)        <span class="co"># update hyperparameters</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    logpdf<span class="sc">$</span><span class="fu">updateom</span>()             <span class="co"># update the outerbase inside</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    logpdf<span class="sc">$</span><span class="fu">updatepara</span>(parlist<span class="sc">$</span>para)  <span class="co"># update parameter</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    logpdf<span class="sc">$</span><span class="fu">optnewton</span>()            <span class="co"># do opt</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    gval <span class="ot">=</span> parlist <span class="co">#match structure</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    gval<span class="sc">$</span>hyp <span class="ot">=</span> <span class="sc">-</span>logpdf<span class="sc">$</span>gradhyp<span class="sc">-</span>om<span class="sc">$</span><span class="fu">hyplpdf_grad</span>(parlist<span class="sc">$</span>hyp)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    gval<span class="sc">$</span>para <span class="ot">=</span> <span class="sc">-</span>logpdf<span class="sc">$</span>gradpara<span class="sc">-</span>logpdf<span class="sc">$</span><span class="fu">paralpdf_grad</span>(parlist<span class="sc">$</span>para)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">val =</span> <span class="sc">-</span>logpdf<span class="sc">$</span>val<span class="sc">-</span>reghyp<span class="sc">-</span>regpara, <span class="at">gval =</span> gval)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="fu">list</span>(<span class="at">val =</span> <span class="cn">Inf</span>, <span class="at">gval =</span> parlist) }</span></code></pre></div>
+<p>This works by querying the objects themselves to check if the
+parameters are reasonable. This package provides a custom deployment of
+<code>BFGS</code> in <code>?BFGS_std</code> to optimize functions like
+this.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>parlist <span class="ot">=</span> <span class="fu">list</span>(<span class="at">para =</span> <span class="fu">getpara</span>(logpdf), <span class="at">hyp =</span> <span class="fu">gethyp</span>(om))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">totobj</span>(parlist)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $val</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 86.02803</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval$para</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 18.283833</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  2.563965</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval$hyp</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             [,1]</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  -4.0817628</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  -0.1352539</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] -12.8532117</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  -0.8817342</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] -13.9215814</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]  -0.9453822</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>opth <span class="ot">=</span> <span class="fu">BFGS_std</span>(totobj, parlist, <span class="at">verbose=</span><span class="dv">3</span>) <span class="co">#</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ########started BFGS#######</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        0    86.028           NA           NA           0.1</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1    83.146     -2.88146     -45.2956           0.1</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2   78.1594     -4.98609    -0.235414       0.50357</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3   60.5026     -17.6542     -31.1706      0.539329</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        4    55.385     -5.11704     -2.77443      0.573679</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        5    46.786     -8.59786     -7.32502      0.606459</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        6   38.3531     -8.43183     -5.27123      0.637561</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        7   33.1031     -5.24912     -9.31017      0.666913</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        8   32.2324    -0.870293      -9.3074      0.694484</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        9   31.5246    -0.707647      -1.5764      0.720271</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; num iter: 10  obj start: 86.02803  obj end: 31.49121</span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; final learning rate: 0.7442976</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; approx lower bound (not achieved): 31.43811</span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #########finished BFGS########</span></span></code></pre></div>
+<p>Then we just have to update out parameters and re-optimize, and we
+can check that we are at least must closer to stationary point.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">totobj</span>(opth<span class="sc">$</span>parlist)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $val</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 31.49121</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval$para</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            [,1]</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -0.5105922</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] -1.4425483</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $gval$hyp</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             [,1]</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.02649228</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,]  0.06837665</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,] -0.40623766</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  0.06382342</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] -0.38065302</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [6,]  0.19144968</span></span></code></pre></div>
+<p>These steps can all be nicely wrapped up in another function
+<code>?BFGS_lpdf</code>, which is a simpler call with the same result.
+Note because of some things not fully understood, these numbers will not
+match <em>exactly</em> above, but they will be quite close and
+functionally the same.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>opth <span class="ot">=</span> <span class="fu">BFGS_lpdf</span>(om, logpdf, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">parlist=</span>parlist, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">verbose =</span> <span class="dv">3</span>, <span class="at">newt=</span> <span class="cn">TRUE</span>)  </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ########started BFGS#######</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        0    86.028           NA           NA           0.1</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1    83.146     -2.88146     -45.2956           0.1</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2   78.1594     -4.98609    -0.235414       0.50357</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3   60.5026     -17.6542     -31.1706      0.539329</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        4    55.385     -5.11704     -2.77443      0.573679</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        5    46.786     -8.59786     -7.32502      0.606459</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        6   38.3531     -8.43183     -5.27123      0.637561</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        7   33.1031     -5.24912     -9.31017      0.666913</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        8   32.2324    -0.870293      -9.3074      0.694484</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        9   31.5246    -0.707647      -1.5764      0.720271</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; num iter: 10  obj start: 86.02803  obj end: 31.49121</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; final learning rate: 0.7442976</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; approx lower bound (not achieved): 31.43811</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #########finished BFGS########</span></span></code></pre></div>
+<p>The revised predictions are then built after hyperparameter
+optimization where we find improved predictive accuracy in nearly every
+category. Here we can see a much better alignment between predictions
+and actual alongside a better plot of standardized residuals (more like
+a standard normal distribution).</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>predtt <span class="ot">=</span> <span class="fu">new</span>(predictor,loglik)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>predtt<span class="sc">$</span><span class="fu">update</span>(xtest)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">=</span> <span class="fu">as.vector</span>(predtt<span class="sc">$</span><span class="fu">mean</span>())</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>varpred <span class="ot">=</span> <span class="fu">as.vector</span>(predtt<span class="sc">$</span><span class="fu">var</span>())</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ytest,yhat)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>yhat)<span class="sc">/</span><span class="fu">sqrt</span>(varpred), <span class="at">main=</span><span class="st">&quot;standarized test residuals&quot;</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;standarized test residuals&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="45%" /><img src="data:image/png;base64,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" width="45%" /></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

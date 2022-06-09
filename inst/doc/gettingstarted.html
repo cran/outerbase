@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started</h1>
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>The goal of <code>outerbase</code> is to make the production of
+near-interpolators easy, stable, and scalable. It is based on a
+<code>C++</code> backend and interfaced with <code>R</code> via
+<code>{Rcpp}</code>. Under the hood, it leverages unique, custom linear
+algebra using <code>{RcppArmadillo}</code> (<a href="http://arma.sourceforge.net">Armadillo</a>) and <code>omp</code>.
+The overall structure is designed to be interacted with in an
+object-oriented manner using <code>Rcpp</code> modules.</p>
+<p>There are ways to interact with <code>outerbase</code> for those who
+are uncomfortable with (or just actively detest) object oriented
+programming.</p>
+<p>To begin, load the package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(outerbase)</span></code></pre></div>
+<p>Note that if you built this package from source, make sure you use a
+compiler that can process <code>omp</code> commands to access the entire
+speed benefits.</p>
+</div>
+<div id="simple-prediction" class="section level2">
+<h2>Simple prediction</h2>
+<p>To understand how to get started with using the package, we predict
+using data from a function with an eight dimensional input commonly
+known as the <a href="https://www.sfu.ca/~ssurjano/borehole.html">Borehole function</a>.
+We begin by generating <code>1000</code> points using a test function
+<code>?obtest_borehole8d</code> built into the package.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sampsize <span class="ot">=</span> <span class="dv">400</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="dv">8</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(sampsize<span class="sc">*</span>d),<span class="at">ncol=</span>d) <span class="co">#uniform samples</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">obtest_borehole8d</span>(x) <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span><span class="fu">rnorm</span>(sampsize)</span></code></pre></div>
+<p>Our goal will be to design a predictor for <code>y</code> given
+<code>x</code> that is a near-interpolator.</p>
+<p>The simplest way to interact with this package is using
+<code>?obfit</code> (fitting outerbase). The function requires
+<code>x</code>, <code>y</code> and two other objects.</p>
+<p>The value of <code>numb</code> is the number of basis functions you
+want to use. The choice of <code>numb</code> is still under research,
+but generally you want it to be large as tolerable. Play around!</p>
+<p>The underlying concepts of this approach come from Gaussian
+processes. Thus the core building block of predictors will be
+covariances functions. The choice of the covariances needed for
+<code>obfit</code> is a list of strings corresponding to each column in
+<code>x</code>. Type <code>listcov()</code> to discover what covariance
+functions are are currently deployed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">listcov</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mat25pow&quot; &quot;mat25&quot;    &quot;mat25ang&quot;</span></span></code></pre></div>
+<p>If you are curious about any of them, type,
+e.g. <code>?covf_mat25pow</code>.</p>
+<p>Note <code>obfit</code> has some checks in place to prevent serious
+damage. They are not foolproof.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x, y, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;elephant&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  covariances must be from listcov()</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x, y[<span class="dv">1</span><span class="sc">:</span><span class="dv">200</span>], <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">5</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in obfit(x, y[1:200], covnames = rep(&quot;mat25pow&quot;, 5)): </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  x and y dims do not align</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,], y[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in obfit(x[1:2, ], y[1:2], covnames = rep(&quot;mat25pow&quot;, 8)): </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  dimension larger than sample size has not been tested</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x, y, <span class="at">numb =</span> <span class="dv">2</span>, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in obfit(x, y, numb = 2, covnames = rep(&quot;mat25pow&quot;, 8)): </span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  number of basis functions should be less than twice the dimension</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(<span class="dv">100</span><span class="sc">*</span>x, y, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  x ranges exceed limits of covariance functions </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  the limits are between 0 and 1  </span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  try rescaling</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(<span class="fl">0.001</span><span class="sc">*</span>x, y, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  x are too small for ranges</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  the limits are between 0 and 1  </span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  try rescaling</span></span></code></pre></div>
+<p>Below is one correct deployment, where <code>mat25pow</code> is used
+for all dimensions. This should take a bit to run, but it should be
+around a second on most modern computers.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ptm <span class="ot">=</span> <span class="fu">proc.time</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x, y, <span class="at">numb=</span><span class="dv">300</span>, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="dv">3</span>) </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; doing partial optimization  </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; max number of cg steps set to 100 </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ########started BFGS#######</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        0   220.745           NA           NA           0.1</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1    -296.9     -517.588     -133.116           0.4</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2   -804.38      -507.41     -5558.19      0.109596</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3   -1106.1     -301.688     -212.856      0.546858</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        4     -1177     -70.8663     -1377.63       0.29044</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        5  -1250.25      -73.245     -141.959      0.328663</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        6  -1297.93     -47.6694     -68.8574      0.367347</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        7  -1320.23     -22.3002     -24.9251       0.40604</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        8  -1336.55     -16.3209     -11.4459      0.444336</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        9  -1353.65     -17.0936      -12.776      0.481882</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       10  -1367.47     -13.8251     -14.6767      0.518378</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       11  -1374.04      -6.5679     -10.1321      0.553582</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       12  -1376.13     -2.08782      -13.956      0.587305</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       13  -1378.24     -2.10842      -3.1903      0.619409</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; num iter: 14  obj start: 220.7445  obj end: -1378.609</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; final learning rate: 0.6497998</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; approx lower bound (not achieved): -1379.679</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #########finished BFGS######## </span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; doing optimization  1 </span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; max number of cg steps set to 315 </span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ########started BFGS#######</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        0  -1379.31           NA           NA        0.3249</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1  -1381.85     -2.53389     -1.74958        0.3249</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2  -1384.84     -2.99056     -3.72161      0.363559</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3  -1386.12     -1.28781     -2.39216       0.40227</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; num iter: 4  obj start: -1379.311  obj end: -1386.528</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; final learning rate: 0.4406213</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; approx lower bound (not achieved): -1387.874</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #########finished BFGS######## </span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; doing optimization  2 </span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; max number of cg steps set to 316 </span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ########started BFGS#######</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        0  -1386.34           NA           NA      0.220311</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1  -1386.37   -0.0320092   -0.0255303      0.220311</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2  -1386.39   -0.0267811   -0.0183269       0.25629</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3  -1386.42   -0.0240469   -0.0264348      0.293669</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; num iter: 4  obj start: -1386.336  obj end: -1386.43</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; final learning rate: 0.3319501</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; approx lower bound (not achieved): -1386.475</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #########finished BFGS########</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="fu">proc.time</span>() <span class="sc">-</span> ptm)[<span class="dv">3</span>])</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; elapsed </span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    0.59</span></span></code></pre></div>
+<p>Note that the package is made using custom parallelization at the
+linear-algebra level. The package relies on <code>omp</code> for
+parallelization, so if the package was not compiled with that in place
+there will be no benefits. The default call of <code>obfit</code> grabs
+all available threads, which is ideal for desktops/laptops. It might be
+less ideal for large clusters where the CPU might be shared.</p>
+<p>We can adjust the number of threads manually. Below we reduce
+ourselves to a single thread, which should slow things down.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ptm <span class="ot">=</span> <span class="fu">proc.time</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>obmodel <span class="ot">=</span> <span class="fu">obfit</span>(x, y, <span class="at">numb=</span><span class="dv">300</span>, <span class="at">covnames=</span><span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">nthreads=</span><span class="dv">1</span>) <span class="co">#optional input</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="fu">proc.time</span>() <span class="sc">-</span> ptm)[<span class="dv">3</span>])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; elapsed </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    1.21</span></span></code></pre></div>
+<p>We can then predict using <code>?obpred</code>. While it is not an
+exact interpolator, it is close.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>predtr <span class="ot">=</span> <span class="fu">obpred</span>(obmodel, x)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rmsetr <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((y<span class="sc">-</span>predtr<span class="sc">$</span>mean)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(predtr<span class="sc">$</span>mean, y,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">paste</span>(<span class="st">&quot;training </span><span class="sc">\n</span><span class="st"> RMSE = &quot;</span>, <span class="fu">round</span>(rmsetr,<span class="dv">3</span>)),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;prediction&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;actual&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Since we generated this data, we can show that <code>outerbase</code>
+can reasonably predict ground truth, meaning overfitting is not an
+issue.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ytrue <span class="ot">=</span> <span class="fu">obtest_borehole8d</span>(x)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rmsetr <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((ytrue<span class="sc">-</span>predtr<span class="sc">$</span>mean)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(predtr<span class="sc">$</span>mean, ytrue,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">paste</span>(<span class="st">&quot;oracle </span><span class="sc">\n</span><span class="st"> RMSE = &quot;</span>, <span class="fu">round</span>(rmsetr,<span class="dv">3</span>)),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;prediction&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;actual&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><code>1000</code> test points generated the same way as our original
+data can also serve as a verification process.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>xtest <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(<span class="dv">1000</span><span class="sc">*</span>d),<span class="at">ncol=</span>d) <span class="co">#prediction points</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ytest <span class="ot">=</span> <span class="fu">obtest_borehole8d</span>(xtest) <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span><span class="fu">rnorm</span>(<span class="dv">1000</span>)</span></code></pre></div>
+<p>The predictions at these new points are also quite good. Not quite as
+good as the residuals on the test set, but we are extrapolating
+here.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>predtest <span class="ot">=</span> <span class="fu">obpred</span>(obmodel, xtest)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>rmsetst <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((ytest<span class="sc">-</span>predtest<span class="sc">$</span>mean)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(predtest<span class="sc">$</span>mean, ytest, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">paste</span>(<span class="st">&quot;testing </span><span class="sc">\n</span><span class="st"> RMSE = &quot;</span>, <span class="fu">round</span>(rmsetst,<span class="dv">3</span>)),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;prediction&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;actual&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>This package also produces variances on the predictions which we can
+use to test reasonableness. The fact that the second histogram looks
+like a standard Normal is promising that the predictions are
+reasonable.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>predtest<span class="sc">$</span>mean),</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;testing </span><span class="sc">\n</span><span class="st">  residuals&quot;</span>, <span class="at">xlab=</span><span class="st">&quot;residuals&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAt1BMVEUAAAAAADoAAGYAOjoAOmYAOpAAZpAAZrY6AAA6ADo6AGY6OgA6OmY6OpA6ZpA6ZrY6kLY6kNtmAABmADpmOgBmOjpmkLZmtrZmtttmtv+QOgCQZgCQZjqQkGaQkLaQtpCQttuQtv+Q29uQ2/+2ZgC2Zjq2ZpC2kDq2kGa225C227a229u22/+2/9u2///T09PbkDrbkGbbtmbbtpDb27bb29vb////tmb/25D/27b//7b//9v///+6BTJ6AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJiElEQVR4nO2da2ObNgBFSZss2dq1i9tttddu3Uz2ataxrjOJzf//XdMDAbaBK4zAAt3zwaVGVsSxXuiBo4y0Ep07Ab5DQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggA+CNr9+rH13G4VXW1GTM8eHgh6fP2kUZA6F7qgOGoW1HZuHM4vKI4EMp/cRdHFS5VT/nkmDl/cm3N/qRyURBe/iCCXaxlip47G0OeNoO1C/htdiitO1JG8+H1BmgthSBQ6efQsCEF5MRKv99nDTXSbCVXXm+xTJA71uZ0RdHkvX8XbaSSC7OIoIEHCirhwcf1PPgpLlx+q5wpBy0wqvDZOxWfCESQu3JQgXX6efrfJDgTJwiWzV9GshVEH6ctMo7KKeXytj35uEqResrAEiRy0LN96fCfaMWmFOSgr66DrvXd3P+hmrE5QYHWQvvI4uniTPS6EClHavtnIcmasHAsKqxVLq/0gKeGu7PCkex3FQlBY/SDVK77PHt+Khkx2n7Psk6yBnt+bcx+OBKn3v74PpA46nXiEm9hpChK1z0vTaRyYaQpKy07T0ExTUPb47U1+wz80ExU0HhQEoCAABQEoCOCzoL3ZjJZe86CzHhQE8FnQHoEKEnegP72Ww/V1kz75he/ubqLL93ExPGTGr/+VA4/P10W44nNOObugSA0d1k766AvXQxtmGqgUlBZ3G7vqtJDr+/vzC7q6z/6rn/TRF64Hx+4OBYmTX2z0R1S46mSRS84vSA5F10/6aEHV4dW9IpZln38XpSofoq5OFrnk7ILUDXn9pI+6cPFSzmBUBe3e6o9cF+GKySKX+CGoftKnKDoyZEWQKVfR5Y+fy0mOymSRS/wQVD/pY3JGOcVTEaRe9meBiskil/ghqH7S57gOSsxI/q18WWaVSrryOacp9ENQ/aRPtRXTUzxq6cLjKtI56GojD/McVJ0scokngmonffKcEZf9oKIyvy27R6aIVSaLXOKJoNpJH9OT/u0mevomr35ETfziz6IVu3yfFEWxMlnkksnci50LCgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFAXwTFNVx1gSd84/XEP19DAVVoCAABQEoCEBBgJkKctciz1SQu+goCEVQJ+icfcdJCDpnpur2l8zCwMaVpIELSsxGiLRpR0TYgnarQkvSsNg2bEHbRbEcPm0oZDMWdLTY/ZjQc1ASoc1WidlREWwdhBzlC+Kbl/vPXZBW1GM7yMwFyW1bS1HVnL4fZM6CZPHRZpqaqO1CFr800I7idgH3yShBqv2qNPgN0Z2cHm8FWSAF5WqCbOZjtXutpRGTgh5ulKCDUjjweJAfgmKVKbaL5u5i2DnIVCtNNXRmekHXmamu26I7OT3eCjL3EUlrL0g4EnV5c0GcsaD8PuLhptejHeYsSO+Y7bkndtaCLEgi/ayNxoIYuKBE5C/dzIUoCI435/W4ulULUVAMb+JNT0D0mAIU1Ni1KSlGFOPrIAU13H9WMFqaHyY/Y0G7lcWzmc2Y624VniDRPcZZqEN0p0bgrSAz3Nzv+TszFuRJdDMVFMR4kCxkV5u432MI5ywovVgn8qFzvJvfT5A5kL3ApOUmomN0J0fgrSDZUZSCWkYUu0R3cgTeCjI5KO71FLkZC8rroKRfd3HOgnRXkSOKhwnyLDoKQhF4K4j3Yg0JOvh/v1Y+AEFZ3OsnuwIQxI7iQYIO35jIrcZo+zcOY21b3XFCdN0jsBRUF6zv365PkDmAC1hbYxl9PGh8QZ5ER0EoAm8FFR3FXn3FGQvKp33a7+b92S82vqDdSptpWn2ozvmzX2x8QdtXeqCjpaPofLdPXWfGW0EmB7WMKDrfL2Z75V4IkiOKmV4j1YT7HDQpQboda+0nut4vNjFBFjjeLzY/QY6jm5ig8aeepyXIZurZcUdxUoJspp5ddxQnJchi6jnsZt5i6rm5o3jieNCkBFlMPYedg2ymntlRRITcUayUHxfR2YWekiCblfYdorMLPSVBfSedD6OzCj0lQedYvDApQRZYjOuHLah5D8tp0U1IkG0NDbcEzVqQTUOPtgQFL8guOuvQFARCUxAITUEgdDCCZj8e5GZpRzbfHHSm6BwLGmTZ4pwE1bw19hU5jo6Cqmfs1roELMjtlVMQBVHQwRkKao+OgkB0FASiC0NQj/VBQQiyXR9k2SkcQVD/+7Muwa1Xd1gmfwRBdcGGE2S9Pqj2i/OG4QRZ5KD50bEOQuuD5ofj9UHzY5hxyhkxiKDzVsIIHwS5DXeWYCcGdxspBbkJR0E+BjsxuNtIKchNOAryMdiJwd1GSkFuws1P0JygIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBgCEEqUUydlOvD1+hjQ+p7Q8R4Kg6pcwwgKDdSlxREtk8VXi7QDtD5KPnUhtDOKpOKSsYQJD+QXGb51KncOuMXi9h8ZR0HFWnlJUMVgdZfO1pdIueZmB7SRZRdUlZhcEE4V8llUBBX64tQllFVWCXMsNQgiwXyKCr0t+21XduK6jj0p2BBKWWNeH4gmxTZhhGkPW3NHoR67z0y62gRHczEpSKxHRHXFXSFlHlf7jr0rghclCHn+BCV2XdzNsJOuHHwQbpB9l/S/CqrDuKNoK6pMwwgKBEL+RydFWJ7a2GhaAuKTPwZhVAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAvgrqHwgWN3iBTc/ZmWBv4JKKAgQvKDtq3dykbNZdvZwIw6WuQK5+uXdxVr9R73E6qQ6zgMOixeCFvKZaPKH3OUKJ7XqLo2WWocQl0YVQXKxmQwpjk3AYRPnh6Db/EWugjILoXQekZcfl4K2r9Z64aI4dvKTehA/BC1NRSOu3Wy6kO9qB2m1iKldB0qQze6M/vgjKH8E21JvydF1UHIkSNRJT/7QOcgEHBZ/BO01VXmpOspBqszlRcwEHDZx3gjab7dVCTJ1UCIF3SoxylgalYIGb+69EaTaJpkhVFYymUa+KVux3epqI0rUUmce0RuQlXQecNjE+SNI9YN0BlErdff6Qeohqd/rOuhibQpg1yW9p+CDIK+hIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIA/wO4KELvrJ2BhwAAAABJRU5ErkJggg==" /><!-- --></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>predtest<span class="sc">$</span>mean)<span class="sc">/</span><span class="fu">sqrt</span>(predtest<span class="sc">$</span>var),</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;testing </span><span class="sc">\n</span><span class="st"> standarized residuals&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;standarized residuals&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

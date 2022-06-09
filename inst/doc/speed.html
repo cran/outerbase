@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Speeding up inference</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Speeding up inference</h1>
+
+
+
+<p>This page is designed to explain how <code>outerbase</code> can
+facilitate fast inference with smart modeling choices.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(outerbase)</span></code></pre></div>
+<p>The potential benefits grow as the sample size grows. We use a sample
+size of <code>500</code> here in the spirit of running quickly. The
+point will be obvious, but more dramatic results can be had by
+increasing the sample size.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sampsize <span class="ot">=</span> <span class="dv">500</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="dv">8</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(sampsize<span class="sc">*</span>d),<span class="at">ncol=</span>d)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">obtest_borehole8d</span>(x)</span></code></pre></div>
+<p>First setup an <code>outermod</code> object.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>om <span class="ot">=</span> <span class="fu">new</span>(outermod)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setcovfs</span>(om, <span class="fu">rep</span>(<span class="st">&quot;mat25pow&quot;</span>,<span class="dv">8</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>knotlist <span class="ot">=</span> <span class="fu">list</span>();</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>d) knotlist[[k]] <span class="ot">=</span> <span class="fu">seq</span>(<span class="fl">0.01</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.025</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setknot</span>(om, knotlist) <span class="co">#40 knot point for each dim</span></span></code></pre></div>
+<p>More data should mean more basis functions. So we will choose
+<code>250</code> terms for our feature space approximation.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="dv">250</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">=</span> om<span class="sc">$</span><span class="fu">selectterms</span>(p)</span></code></pre></div>
+<div id="different-models" class="section level2">
+<h2>Different models</h2>
+<p>To begin, lets use <code>?loglik_std</code> to represent our slow
+approach.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>loglik_slow <span class="ot">=</span> <span class="fu">new</span>(loglik_std, om, terms, y, x) </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>logpr_slow <span class="ot">=</span> <span class="fu">new</span>(logpr_gauss, om, terms)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>logpdf_slow <span class="ot">=</span> <span class="fu">new</span>(lpdfvec, loglik_slow, logpr_slow)</span></code></pre></div>
+<p><code>logpdf_slow</code> can be optimized using
+<code>lpdf$optnewton</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>logpdf_slow<span class="sc">$</span><span class="fu">optnewton</span>()</span></code></pre></div>
+<p>Newton’s method involves solving a linear system, thus it takes one
+step, but is expensive.</p>
+<p><code>?loglik_gauss</code> is a <code>lpdf</code> model designed for
+speed. It is a nice comparison because <code>loglik_gauss</code> uses
+the same model as <code>loglik_std</code>, with a few approximations for
+speed.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>loglik_fast <span class="ot">=</span> <span class="fu">new</span>(loglik_gauss, om, terms, y, x) </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>logpr_fast <span class="ot">=</span> <span class="fu">new</span>(logpr_gauss, om, terms)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>logpdf_fast <span class="ot">=</span> <span class="fu">new</span>(lpdfvec, loglik_fast, logpr_fast)</span></code></pre></div>
+<p><code>logpdf_fast</code> will through an error if you try to use
+<code>optnewton</code>. This is because it is written so that it never
+builds a Hessian (<code>hess</code> in the code) matrix.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>logpdf_fast<span class="sc">$</span><span class="fu">optnewton</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in logpdf_fast$optnewton(): addition: incompatible matrix dimensions: 0x0 and 250x250</span></span></code></pre></div>
+<p>It is instead suggested to use <code>lpdf$optcg</code> (conjugate
+gradient) to optimize the coefficients in the fast version.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>logpdf_fast<span class="sc">$</span><span class="fu">optcg</span>(<span class="fl">0.001</span>,  <span class="co"># tolerance</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">100</span>)    <span class="co"># max epochs</span></span></code></pre></div>
+<p>As an aside, <code>omp</code> speed ups are possible, but you need to
+have correctly compiled with <code>omp</code>. One check is to call the
+following.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ob <span class="ot">=</span> <span class="fu">new</span>(outerbase, om, x) </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ob<span class="sc">$</span>nthreads</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 4</span></span></code></pre></div>
+<p>If the answer is <code>1</code> but you have a multicore processor
+(most modern processors), your installation might be incorrect.</p>
+<p>You can manually set the number of threads for <code>lpdf</code>
+objects.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>logpdf_slow<span class="sc">$</span><span class="fu">setnthreads</span>(<span class="dv">4</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>logpdf_fast<span class="sc">$</span><span class="fu">setnthreads</span>(<span class="dv">4</span>)</span></code></pre></div>
+</div>
+<div id="timing" class="section level2">
+<h2>Timing</h2>
+<p>The main cost of fitting <code>outerbase</code> models is
+hyperparameter optimization. The difference between
+<code>logpdf_slow</code> and <code>logpdf_fast</code> will be apparent.
+Let’s save starting points (since they share <code>om</code>) for
+fairness.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>parlist_slow <span class="ot">=</span> <span class="fu">list</span>(<span class="at">para =</span> <span class="fu">getpara</span>(logpdf_slow), <span class="at">hyp =</span> <span class="fu">gethyp</span>(om))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>parlist_fast <span class="ot">=</span> <span class="fu">list</span>(<span class="at">para =</span> <span class="fu">getpara</span>(logpdf_fast), <span class="at">hyp =</span> <span class="fu">gethyp</span>(om))</span></code></pre></div>
+<p>Test points will verify the predictions are equally good with either
+model, the only difference is speed.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>xtest <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(<span class="dv">1000</span><span class="sc">*</span>d),<span class="at">ncol=</span>d) <span class="co">#prediction points</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ytest <span class="ot">=</span>  <span class="fu">obtest_borehole8d</span>(xtest)</span></code></pre></div>
+<p>We will use the unsophisticated <code>proc.time</code> to do some
+quick timing comparisons.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ptm <span class="ot">=</span> <span class="fu">proc.time</span>()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>opth <span class="ot">=</span> <span class="fu">BFGS_lpdf</span>(om, logpdf_slow, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">parlist=</span>parlist_slow, <span class="at">newt=</span><span class="cn">TRUE</span>)    </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>t_slow <span class="ot">=</span> <span class="fu">proc.time</span>() <span class="sc">-</span> ptm</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>pred_slow <span class="ot">=</span> <span class="fu">new</span>(predictor,loglik_slow)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>pred_slow<span class="sc">$</span><span class="fu">update</span>(xtest)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>yhat_slow <span class="ot">=</span> <span class="fu">as.vector</span>(pred_slow<span class="sc">$</span><span class="fu">mean</span>())</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(t_slow)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   13.36    0.20   12.85</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ptm <span class="ot">=</span> <span class="fu">proc.time</span>()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>opth <span class="ot">=</span> <span class="fu">BFGS_lpdf</span>(om, logpdf_fast, </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">parlist=</span>parlist_fast, <span class="at">newt=</span><span class="cn">FALSE</span>)  </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>t_fast <span class="ot">=</span> <span class="fu">proc.time</span>() <span class="sc">-</span> ptm</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>pred_fast <span class="ot">=</span> <span class="fu">new</span>(predictor,loglik_fast)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>pred_fast<span class="sc">$</span><span class="fu">update</span>(xtest)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>yhat_fast <span class="ot">=</span> <span class="fu">as.vector</span>(pred_fast<span class="sc">$</span><span class="fu">mean</span>())</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(t_fast)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    1.52    0.03    0.53</span></span></code></pre></div>
+</div>
+<div id="comparison-of-results" class="section level2">
+<h2>Comparison of results</h2>
+<p>And simply plotting the results tells the story: faster inference
+with no discernible drop off in quality. Note there are serious
+approximations here, but the approximations just have a negligible
+effect.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>rmse_slow <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((ytest<span class="sc">-</span>yhat_slow)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>yhat_slow), <span class="at">main=</span><span class="fu">paste</span>(<span class="st">&quot;slow method </span><span class="sc">\n</span><span class="st"> rmse:&quot;</span>, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">round</span>(rmse_slow,<span class="dv">3</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;, time:&quot;</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">round</span>(t_slow[<span class="dv">3</span>],<span class="dv">2</span>),<span class="st">&#39;s&#39;</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;prediction residuals&quot;</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>rmse_fast <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((ytest<span class="sc">-</span>yhat_fast)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>((ytest<span class="sc">-</span>yhat_fast), <span class="at">main=</span><span class="fu">paste</span>(<span class="st">&quot;fast method </span><span class="sc">\n</span><span class="st"> rmse =&quot;</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                                      <span class="fu">round</span>(rmse_fast,<span class="dv">3</span>),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">&quot;, time:&quot;</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                                   <span class="fu">round</span>(t_fast[<span class="dv">3</span>],<span class="dv">2</span>),<span class="st">&#39;s&#39;</span>), </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;prediction residuals&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="45%" /><img src="data:image/png;base64,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" width="45%" /></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
